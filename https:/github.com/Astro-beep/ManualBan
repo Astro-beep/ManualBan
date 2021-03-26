@@ -1,0 +1,47 @@
+--[[
+	Made by risissar#0139
+	
+	DataStore Manual Ban
+	Admin Ranks
+]]
+
+
+
+local Banned = {"Autoban"}
+local Admins = {""}
+local Prefix = ";"
+
+
+local Ban = game:GetService("DataStoreService"):GetDataStore("BanList")
+
+game.Players.PlayerAdded:connect(function(p)
+	for i,v in pairs(Banned) do
+		if p.Name == v then
+			p:Kick()
+		end
+	end
+
+	local Status = Ban:GetAsync(p.userId)
+	if Status then
+		p:Kick()
+	elseif Status == nil then
+		Ban:SetAsync(p.userId, false)
+	end
+	for i,v in pairs(Admins) do
+		if p.Name == v or p.userId == game.CreatorId then
+			p.Chatted:connect(function(msg)
+				if msg:lower():sub(1,#Prefix + 4) == Prefix:lower() .. "ban " then
+					local name = msg:lower():sub(#Prefix + 5)
+					if v.Name:sub(1, #name):lower() == name then
+						Ban:SetAsync(game.Players:GetUserIdFromNameAsync(name), true)
+						v:Kick()
+					end
+				end
+				if msg:lower():sub(1,#Prefix + 6) == Prefix:lower() .. "unban " then
+					local name2 = msg:lower():sub(#Prefix + 7)
+					Ban:SetAsync(tonumber(game.Players:GetNameFromUserIdAsync(name2)), false)
+				end
+			end)
+		end
+	end
+end)
