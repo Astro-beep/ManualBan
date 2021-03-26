@@ -32,11 +32,19 @@ game.Players.PlayerAdded:connect(function(p)
 			p.Chatted:connect(function(msg)
 				if msg:lower():sub(1,#Prefix + 4) == Prefix:lower() .. "ban " then
 					local name = msg:lower():sub(#Prefix + 5)
-					if v.Name:sub(1, #name):lower() == name then
-						Ban:SetAsync(game.Players:GetUserIdFromNameAsync(name), true)
-						v:Kick()
+					for i,v in pairs(game.Players:GetChildren()) do
+						if v.Name:sub(1, #name):lower() == name then
+							if game.Players:FindFirstChild(name) == nil then
+								Ban:SetAsync(game.Players:GetUserIdFromNameAsync(name), true)
+								v:Kick()
+							else
+								Ban:SetAsync(game.Players:GetUserIdFromNameAsync(name), true)
+							end
+						end
 					end
 				end
+
+
 				if msg:lower():sub(1,#Prefix + 6) == Prefix:lower() .. "unban " then
 					local name2 = msg:lower():sub(#Prefix + 7)
 					Ban:SetAsync(tonumber(game.Players:GetNameFromUserIdAsync(name2)), false)
